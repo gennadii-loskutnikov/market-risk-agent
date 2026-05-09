@@ -95,14 +95,3 @@ CREATE TABLE IF NOT EXISTS analyst_firm_recommendations (
 
 CREATE INDEX IF NOT EXISTS idx_firm_recs_ticker_date
     ON analyst_firm_recommendations(ticker, date);
-
-CREATE TABLE IF NOT EXISTS refresh_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    job_name TEXT NOT NULL,
-    ticker TEXT,
-    status TEXT NOT NULL,
-    error TEXT,
-    started_at TEXT NOT NULL,
-    finished_at TEXT,
-    duration_ms INTEGER
-);
