@@ -39,8 +39,8 @@ A language model is used for natural-language understanding and tool selection. 
 ```
 Finviz (Top Gainers, New Highs)
   → SQLite cache
-  → on-demand yfinance enrichment
-      (snapshot, price history, analyst recs, peers)
+  → on-demand enrichment
+      (snapshot, price history, analyst recs via yfinance; peers via Finviz)
   → OpenAI router  →  deterministic tools  →  OpenAI answer formatter
   → Streamlit chat + Plotly charts
 ```
@@ -62,7 +62,7 @@ Finviz signal data is collected through `finvizfinance`, with `pyfinviz` as a fa
 ### Install
 
 ```bash
-git clone <repo>
+git clone https://github.com/gennadii-loskutnikov/market-risk-agent.git
 cd market-risk-agent
 uv sync
 ```
@@ -80,6 +80,15 @@ OPENAI_API_KEY=your_key_here
 OPENAI_MODEL=gpt-4.1-mini
 DATABASE_PATH=data/market_data.sqlite
 STARTUP_PREFETCH_LIMIT=5
+```
+
+### Smoke test
+
+```bash
+uv run python -m compileall src/ app.py -q
+uv run python -c "from src.db import init_db; init_db(); print('db ok')"
+uv run python -c "from src.refresh import refresh_market_signals; print(refresh_market_signals())"
+uv run python -c "from src.tools import list_market_signals; print(list_market_signals('top_gainers', 5))"
 ```
 
 ### Run
@@ -101,9 +110,9 @@ On first launch the app will:
 ```
 Show me top gainers
 Which companies reached new highs?
-Analyze AKAM
-стоит брать?
-Compare AKAM with competitors
+Analyze <TICKER_FROM_RESULTS>
+Is it worth buying?
+Compare <TICKER_FROM_RESULTS> with competitors
 How fresh is the data?
 ```
 
@@ -169,3 +178,4 @@ data/
 - Firm-level analyst recommendations depend on yfinance availability; some tickers may have no data
 - Very small or recently listed tickers may fail yfinance enrichment — the app logs these and continues
 - This is not a trading bot and does not give direct buy/sell advice
+- Finviz and yfinance are unofficial data sources; the prototype is intended to demonstrate the agentic workflow rather than provide production-grade market data
