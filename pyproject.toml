@@ -1,0 +1,18 @@
+[project]
+name = "market-risk-agent"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "streamlit>=1.56.0",
+    "openai>=1.60.0",
+    "python-dotenv",
+    "pydantic",
+    "pandas",
+    "yfinance",
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+    "finvizfinance",
+    "plotly",
+    "pyfinviz>=1.2",
+]
