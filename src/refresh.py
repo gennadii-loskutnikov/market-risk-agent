@@ -11,19 +11,6 @@ from src.yahoo_client import (
 )
 
 
-def startup_refresh() -> dict:
-    init_db()
-    results = {"signals": refresh_market_signals()}
-    tickers = get_top_tickers(STARTUP_PREFETCH_LIMIT)
-    prefetch = []
-    for ticker in tickers:
-        try:
-            prefetch.append(refresh_ticker(ticker))
-        except Exception as e:
-            prefetch.append({"ticker": ticker, "ok": False, "error": str(e)})
-    results["prefetch"] = prefetch
-    return results
-
 
 def refresh_signal(signal_type: str) -> dict:
     now = _now()
@@ -181,6 +168,7 @@ def get_top_tickers(limit: int) -> list[str]:
 
 def _store_signals(signal_type: str, rows: list[dict], now: str):
     with get_conn() as conn:
+        conn.execute("DELETE FROM market_signals WHERE signal_type = ?", (signal_type,))
         for row in rows:
             conn.execute(
                 """
@@ -204,6 +192,7 @@ def _store_signals(signal_type: str, rows: list[dict], now: str):
 
 def _store_snapshot(snapshot: dict, now: str):
     with get_conn() as conn:
+        conn.execute("DELETE FROM ticker_snapshots WHERE ticker = ?", (snapshot["ticker"],))
         conn.execute(
             """
             INSERT INTO ticker_snapshots
@@ -255,6 +244,7 @@ def _store_history(rows: list[dict]):
 
 def _store_recommendations(recs: dict, now: str):
     with get_conn() as conn:
+        conn.execute("DELETE FROM analyst_recommendations WHERE ticker = ?", (recs["ticker"],))
         conn.execute(
             """
             INSERT INTO analyst_recommendations

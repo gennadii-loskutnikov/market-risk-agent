@@ -1,3 +1,5 @@
+import logging
+
 import streamlit as st
 from src.config import OPENAI_API_KEY, STARTUP_PREFETCH_LIMIT
 from src.db import init_db
@@ -12,6 +14,15 @@ from src.tools import (
 from src.llm_router import route_user_message, AgentAction
 from src.llm_answer import generate_final_answer
 from src.charts import build_price_chart, build_comparison_chart
+
+_fmt = logging.Formatter("%(asctime)s %(name)s %(levelname)s %(message)s")
+for _name in ("src.finviz_client", "src.yahoo_client"):
+    _logger = logging.getLogger(_name)
+    if not _logger.handlers:
+        _handler = logging.StreamHandler()
+        _handler.setFormatter(_fmt)
+        _logger.addHandler(_handler)
+        _logger.setLevel(logging.WARNING)
 
 
 def run_agent_action(action: AgentAction) -> dict:

@@ -1,4 +1,8 @@
+import logging
+
 import yfinance as yf
+
+_log = logging.getLogger(__name__)
 
 
 def fetch_ticker_snapshot(ticker: str) -> dict:
@@ -77,7 +81,8 @@ def fetch_analyst_recommendations(ticker: str) -> dict | None:
             "consensus": _calc_consensus(sb, b, h, s, ss),
             "source": "yfinance",
         }
-    except Exception:
+    except Exception as e:
+        _log.warning(f"fetch_analyst_recommendations failed for {ticker}: {e}")
         return None
 
 
@@ -99,7 +104,8 @@ def fetch_analyst_firm_recommendations(ticker: str, limit: int = 15) -> list[dic
                 "action": str(row.get("Action", "")).strip() or None,
             })
         return result
-    except Exception:
+    except Exception as e:
+        _log.warning(f"fetch_analyst_firm_recommendations failed for {ticker}: {e}")
         return []
 
 
@@ -127,7 +133,8 @@ def fetch_related_companies(ticker: str) -> list[dict]:
                     "source": "finviz",
                 })
         return result
-    except Exception:
+    except Exception as e:
+        _log.warning(f"fetch_related_companies failed for {ticker}: {e}")
         return []
 
 

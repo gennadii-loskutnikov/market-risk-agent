@@ -2,8 +2,7 @@ import json
 from openai import OpenAI
 from src.config import OPENAI_API_KEY, OPENAI_MODEL
 
-def _get_client() -> OpenAI:
-    return OpenAI(api_key=OPENAI_API_KEY)
+_client = OpenAI(api_key=OPENAI_API_KEY)
 
 _SYSTEM_PROMPT = """You are a market-data assistant. Answer using only the provided tool result data.
 
@@ -22,12 +21,24 @@ Rules:
 """
 
 
+def _trim_result(tool_result: dict) -> dict:
+    if "comparisons" not in tool_result:
+        return tool_result
+    trimmed = {**tool_result, "comparisons": []}
+    for comp in tool_result["comparisons"]:
+        trimmed["comparisons"].append({
+            k: v for k, v in comp.items()
+            if k not in ("firm_recommendations", "freshness")
+        })
+    return trimmed
+
+
 def generate_final_answer(user_message: str, tool_result: dict) -> str:
     content = (
         f"User asked: {user_message}\n\n"
-        f"Tool result:\n{json.dumps(tool_result, indent=2, default=str)}"
+        f"Tool result:\n{json.dumps(_trim_result(tool_result), default=str)}"
     )
-    response = _get_client().chat.completions.create(
+    response = _client.chat.completions.create(
         model=OPENAI_MODEL,
         messages=[
             {"role": "system", "content": _SYSTEM_PROMPT},

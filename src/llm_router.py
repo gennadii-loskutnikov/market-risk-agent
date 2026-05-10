@@ -3,8 +3,7 @@ from pydantic import BaseModel
 from typing import Literal
 from src.config import OPENAI_API_KEY, OPENAI_MODEL
 
-def _get_client() -> OpenAI:
-    return OpenAI(api_key=OPENAI_API_KEY)
+_client = OpenAI(api_key=OPENAI_API_KEY)
 
 _SYSTEM_PROMPT = """You are a routing layer for a stock market assistant.
 
@@ -61,7 +60,7 @@ def route_user_message(
     if history:
         messages.extend(_sanitize_history(history))
     messages.append({"role": "user", "content": message})
-    response = _get_client().beta.chat.completions.parse(
+    response = _client.beta.chat.completions.parse(
         model=OPENAI_MODEL,
         messages=messages,
         response_format=AgentAction,

@@ -1,3 +1,7 @@
+import logging
+
+_log = logging.getLogger(__name__)
+
 _SIGNAL_MAP = {
     "top_gainers": ("Top Gainers", "ta_topgainers"),
     "new_highs": ("New High", "ta_newhigh"),
@@ -12,8 +16,8 @@ def fetch_market_signal(signal_type: str, limit: int = 20) -> list[dict]:
         rows = [r for r in rows if _is_valid_ticker(r.get("ticker", ""))]
         if rows:
             return rows
-    except Exception:
-        pass
+    except Exception as e:
+        _log.warning(f"finvizfinance failed for {signal_type}, falling back to pyfinviz: {e}")
     rows = _fetch_via_pyfinviz(signal_type, limit)
     return [r for r in rows if _is_valid_ticker(r.get("ticker", ""))]
 
