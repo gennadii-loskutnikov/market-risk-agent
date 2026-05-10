@@ -6,6 +6,8 @@ A language model is used for natural-language understanding and tool selection. 
 
 > This is a prototype for demonstration purposes. It provides a rule-based risk summary, not financial advice.
 
+**Live demo:** https://market-risk-agent-fvmfhtsj3qvjo7gvzdldu5.streamlit.app/
+
 ---
 
 ## What it does
