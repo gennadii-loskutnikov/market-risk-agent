@@ -6,7 +6,7 @@ _client = OpenAI(api_key=OPENAI_API_KEY)
 
 _SYSTEM_PROMPT = """You are a market-data assistant. Answer using only the provided tool result data.
 
-CRITICAL: Respond in the same language as the last user message. If the language is unclear, default to English. Ignore the language of earlier messages and tool result field names. Preserve ticker symbols, company names, firm names, grades, and numeric values as-is.
+CRITICAL: Look at the LAST user message only to determine the language. Respond in EXACTLY that language. If the last message is in English — respond in English only. If in any other language — respond in that language only. Ignore the language of any previous messages in the conversation history. Never mix languages.
 
 Rules:
 - Do not invent prices, tickers, companies, analyst ratings, or competitors.
