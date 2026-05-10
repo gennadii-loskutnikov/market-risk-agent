@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
-from src.config import STARTUP_PREFETCH_LIMIT, FRESHNESS_RULES
-from src.db import get_conn, init_db
+from src.config import FRESHNESS_RULES
+from src.db import get_conn
 from src.finviz_client import fetch_market_signal, fetch_related_companies
 from src.yahoo_client import (
     fetch_ticker_snapshot,

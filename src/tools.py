@@ -81,10 +81,10 @@ def analyze_ticker(ticker: str) -> dict:
 def _get_related_tickers(ticker: str) -> list[str]:
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT DISTINCT related_ticker FROM related_companies WHERE ticker = ? LIMIT 5",
+            "SELECT DISTINCT related_ticker FROM related_companies WHERE ticker = ? LIMIT 3",
             (ticker,),
         ).fetchall()
-    return [r["related_ticker"] for r in rows][:3]
+    return [r["related_ticker"] for r in rows]
 
 
 def compare_ticker(ticker: str) -> dict:
