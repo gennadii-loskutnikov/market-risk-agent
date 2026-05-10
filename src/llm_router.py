@@ -10,7 +10,7 @@ _SYSTEM_PROMPT = """You are a routing layer for a stock market assistant.
 Convert the user's message into exactly one structured action.
 
 Available actions:
-- list_market_signals: user asks for top gainers, new highs, most active, market winners, biggest movers
+- list_market_signals: user asks for top gainers, new highs, market winners, biggest movers
 - analyze_ticker: user asks about a specific ticker or company
 - compare_ticker: user asks to compare a ticker with competitors, peers, or related companies
 - refresh_ticker: user explicitly asks to refresh or update ticker data
@@ -36,7 +36,7 @@ class AgentAction(BaseModel):
         "database_status",
         "unknown",
     ]
-    signal_type: Literal["top_gainers", "new_highs", "top_losers", "most_active"] | None = None
+    signal_type: Literal["top_gainers", "new_highs"] | None = None
     ticker: str | None = None
 
 
@@ -55,7 +55,7 @@ def route_user_message(
 ) -> AgentAction:
     system = _SYSTEM_PROMPT
     if last_ticker:
-        system += f"\n\nContext: the most recently discussed ticker was {last_ticker}. If the user's message is vague or short but plausibly about this ticker (e.g. 'should I buy?', 'what do you think?', 'стоит брать?', 'берем?'), route it as analyze_ticker with ticker={last_ticker}."
+        system += f"\n\nContext: the most recently discussed ticker was {last_ticker}. If the user's message is vague or short but plausibly about this ticker (e.g. 'should I buy?', 'what do you think?'), route it as analyze_ticker with ticker={last_ticker}."
     messages = [{"role": "system", "content": system}]
     if history:
         messages.extend(_sanitize_history(history))

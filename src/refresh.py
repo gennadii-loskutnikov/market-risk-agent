@@ -1,15 +1,13 @@
 from datetime import datetime, timezone
 from src.config import STARTUP_PREFETCH_LIMIT, FRESHNESS_RULES
 from src.db import get_conn, init_db
-from src.finviz_client import fetch_market_signal
+from src.finviz_client import fetch_market_signal, fetch_related_companies
 from src.yahoo_client import (
     fetch_ticker_snapshot,
     fetch_price_history,
     fetch_analyst_recommendations,
     fetch_analyst_firm_recommendations,
-    fetch_related_companies,
 )
-
 
 
 def refresh_signal(signal_type: str) -> dict:

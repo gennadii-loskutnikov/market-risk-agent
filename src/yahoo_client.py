@@ -109,35 +109,6 @@ def fetch_analyst_firm_recommendations(ticker: str, limit: int = 15) -> list[dic
         return []
 
 
-def fetch_related_companies(ticker: str) -> list[dict]:
-    try:
-        from finvizfinance.quote import finvizfinance
-        stock = finvizfinance(ticker.upper())
-        peers = stock.ticker_peer()
-        if peers is None:
-            return []
-        if isinstance(peers, dict):
-            peer_list = list(peers.values())
-        elif hasattr(peers, "tolist"):
-            peer_list = peers.tolist()
-        else:
-            peer_list = list(peers)
-        result = []
-        for p in peer_list:
-            peer = str(p).strip().upper()
-            if peer and peer != ticker.upper():
-                result.append({
-                    "related_ticker": peer,
-                    "related_company_name": None,
-                    "relation_type": "peer",
-                    "source": "finviz",
-                })
-        return result
-    except Exception as e:
-        _log.warning(f"fetch_related_companies failed for {ticker}: {e}")
-        return []
-
-
 def _format_market_cap(val) -> str | None:
     if val is None:
         return None

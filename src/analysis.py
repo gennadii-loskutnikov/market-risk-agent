@@ -95,10 +95,10 @@ def build_rule_based_summary(
             pass
 
     if score >= 3:
-        label = "Candidate for further review"
+        label_code = "candidate_for_review"
     elif score >= 1:
-        label = "Watchlist"
+        label_code = "watchlist"
     else:
-        label = "Avoid for now"
+        label_code = "avoid_for_now"
 
-    return {"label": label, "score": score, "reasons": reasons}
+    return {"label_code": label_code, "score": score, "reasons": reasons}

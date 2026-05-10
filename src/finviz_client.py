@@ -64,12 +64,9 @@ def _fetch_via_pyfinviz(signal_type: str, limit: int) -> list[dict]:
         return []
 
     rows = []
-    rank = 0
     for page_df in s.data_frames.values():
         for _, row in page_df.iterrows():
-            if rank >= limit:
-                break
-            rank += 1
+            rank = len(rows) + 1
             rows.append({
                 "ticker": str(row.get("Ticker", "")).strip(),
                 "company_name": str(row.get("Company", "")).strip() or None,
@@ -79,7 +76,38 @@ def _fetch_via_pyfinviz(signal_type: str, limit: int) -> list[dict]:
                 "rank": rank,
                 "source": "pyfinviz",
             })
+            if len(rows) >= limit:
+                return rows
     return rows
+
+
+def fetch_related_companies(ticker: str) -> list[dict]:
+    try:
+        from finvizfinance.quote import finvizfinance
+        stock = finvizfinance(ticker.upper())
+        peers = stock.ticker_peer()
+        if peers is None:
+            return []
+        if isinstance(peers, dict):
+            peer_list = list(peers.values())
+        elif hasattr(peers, "tolist"):
+            peer_list = peers.tolist()
+        else:
+            peer_list = list(peers)
+        result = []
+        for p in peer_list:
+            peer = str(p).strip().upper()
+            if peer and peer != ticker.upper():
+                result.append({
+                    "related_ticker": peer,
+                    "related_company_name": None,
+                    "relation_type": "peer",
+                    "source": "finviz",
+                })
+        return result
+    except Exception as e:
+        _log.warning(f"fetch_related_companies failed for {ticker}: {e}")
+        return []
 
 
 def _safe_float(val, multiply: float = 1) -> float | None:
