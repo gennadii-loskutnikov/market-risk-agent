@@ -181,3 +181,9 @@ data/
 - Very small or recently listed tickers may fail yfinance enrichment — the app logs these and continues
 - This is not a trading bot and does not give direct buy/sell advice
 - Finviz and yfinance are unofficial data sources; the prototype is intended to demonstrate the agentic workflow rather than provide production-grade market data
+
+### UI concurrency
+
+Streamlit's execution model is single-threaded: sidebar controls (e.g. "Refresh Market Signals") are unresponsive while the chat is generating a response. Clicking them during generation has no effect — the click is processed after the response completes.
+
+The correct fix is to run the agent in a background thread and stream results back to the UI. This was intentionally left out of scope for this prototype to keep the implementation simple.

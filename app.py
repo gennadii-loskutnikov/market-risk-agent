@@ -113,7 +113,8 @@ if "messages" not in st.session_state:
 if "last_ticker" not in st.session_state:
     st.session_state["last_ticker"] = None
 
-with st.sidebar:
+@st.fragment
+def render_sidebar():
     st.header("Controls")
 
     if st.button("Refresh Market Signals"):
@@ -125,6 +126,8 @@ with st.sidebar:
     st.divider()
 
     if st.button("Database Status"):
+        st.session_state["db_status_open"] = not st.session_state.get("db_status_open", False)
+    if st.session_state.get("db_status_open"):
         status = get_database_status()
         if status.get("ok"):
             for table, info in status["tables"].items():
@@ -148,6 +151,10 @@ with st.sidebar:
             if not r.get("ok"):
                 errors = [k for k in ("snapshot_error", "history_error") if r.get(k)]
                 st.caption(f"  ✗ {r['ticker']}: {', '.join(r.get(e, '') for e in errors) or 'failed'}")
+
+
+with st.sidebar:
+    render_sidebar()
 
 for msg in st.session_state["messages"]:
     with st.chat_message(msg["role"]):
