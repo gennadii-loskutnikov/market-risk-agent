@@ -26,7 +26,7 @@ def refresh_market_signals() -> dict:
     return {s: refresh_signal(s) for s in ("top_gainers", "new_highs")}
 
 
-def refresh_ticker(ticker: str) -> dict:
+def refresh_ticker(ticker: str, light: bool = False) -> dict:
     ticker = ticker.upper()
     now = _now()
     result = {
@@ -52,39 +52,61 @@ def refresh_ticker(ticker: str) -> dict:
     except Exception as e:
         result["history_error"] = str(e)
 
+    if not light:
+        try:
+            recs = fetch_analyst_recommendations(ticker)
+            if recs:
+                _store_recommendations(recs, now)
+                result["recommendations_ok"] = True
+            else:
+                result["recommendations_note"] = "No recommendations available"
+        except Exception as e:
+            result["recs_error"] = str(e)
+
+        try:
+            firm_recs = fetch_analyst_firm_recommendations(ticker)
+            if firm_recs:
+                _store_firm_recommendations(ticker, firm_recs, now)
+                result["firm_recs_ok"] = True
+                result["firm_recs_count"] = len(firm_recs)
+            else:
+                result["firm_recs_note"] = "No firm recommendations available"
+        except Exception as e:
+            result["firm_recs_error"] = str(e)
+
+        try:
+            related = fetch_related_companies(ticker)
+            if related:
+                _store_related(ticker, related, now)
+                result["related_ok"] = True
+                result["related_count"] = len(related)
+            else:
+                result["related_note"] = "No related companies found"
+        except Exception as e:
+            result["related_error"] = str(e)
+
+    result["ok"] = result["snapshot_ok"] or result["history_ok"]
+    return result
+
+
+def refresh_ticker_analyst_data(ticker: str) -> dict:
+    ticker = ticker.upper()
+    now = _now()
+    result = {}
     try:
         recs = fetch_analyst_recommendations(ticker)
         if recs:
             _store_recommendations(recs, now)
             result["recommendations_ok"] = True
-        else:
-            result["recommendations_note"] = "No recommendations available"
     except Exception as e:
         result["recs_error"] = str(e)
-
     try:
         firm_recs = fetch_analyst_firm_recommendations(ticker)
         if firm_recs:
             _store_firm_recommendations(ticker, firm_recs, now)
             result["firm_recs_ok"] = True
-            result["firm_recs_count"] = len(firm_recs)
-        else:
-            result["firm_recs_note"] = "No firm recommendations available"
     except Exception as e:
         result["firm_recs_error"] = str(e)
-
-    try:
-        related = fetch_related_companies(ticker)
-        if related:
-            _store_related(ticker, related, now)
-            result["related_ok"] = True
-            result["related_count"] = len(related)
-        else:
-            result["related_note"] = "No related companies found"
-    except Exception as e:
-        result["related_error"] = str(e)
-
-    result["ok"] = result["snapshot_ok"] or result["history_ok"]
     return result
 
 

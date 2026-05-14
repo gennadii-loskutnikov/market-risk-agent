@@ -1,5 +1,5 @@
 from src.db import get_conn
-from src.refresh import ensure_ticker_fresh, refresh_ticker
+from src.refresh import ensure_ticker_fresh, refresh_ticker, refresh_ticker_analyst_data
 from src.analysis import calculate_price_changes, build_rule_based_summary
 
 
@@ -45,6 +45,14 @@ def analyze_ticker(ticker: str) -> dict:
 
     if not snapshot:
         return {"ok": False, "error": f"No data for ticker: {ticker}"}
+
+    if not recs:
+        refresh_ticker_analyst_data(ticker)
+        with get_conn() as conn:
+            recs = conn.execute(
+                "SELECT * FROM analyst_recommendations WHERE ticker = ? ORDER BY id DESC LIMIT 1",
+                (ticker,),
+            ).fetchone()
 
     with get_conn() as conn:
         firm_recs = conn.execute(

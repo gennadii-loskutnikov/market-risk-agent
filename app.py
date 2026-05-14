@@ -91,7 +91,7 @@ if "startup_refresh_done" not in st.session_state:
         for i, ticker in enumerate(tickers):
             st.write(f"Pre-fetching {ticker} ({i + 1}/{len(tickers)})...")
             try:
-                r = refresh_ticker(ticker)
+                r = refresh_ticker(ticker, light=True)
                 prefetch.append(r)
                 if r.get("ok"):
                     st.write(f"  ✓ {ticker}")
